@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import ShaderBackground from '@/components/ShaderBackground';
 import CustomCursor from '@/components/CustomCursor';
-import EnhancedNavigation from '@/components/EnhancedNavigation';
+import QuantumNavigation from '@/components/QuantumNavigation';
 import EnhancedHero from '@/components/EnhancedHero';
-import EnhancedFeatures from '@/components/EnhancedFeatures';
+import QuantumFeatures from '@/components/QuantumFeatures';
 import EnhancedSchedule from '@/components/EnhancedSchedule';
 import EnhancedRegister from '@/components/EnhancedRegister';
 import EnhancedSponsors from '@/components/EnhancedSponsors';
@@ -17,14 +17,20 @@ const Index = () => {
   const [loadProgress, setLoadProgress] = useState(0);
   
   useEffect(() => {
-    // Create loading animation
+    // Optimize the loading animation
     const startLoading = () => {
       let progress = 0;
-      const interval = setInterval(() => {
-        progress += Math.random() * 10;
-        if (progress > 100) {
+      const totalDuration = 2000; // 2 seconds total loading time
+      const interval = 100; // Update every 100ms
+      const steps = totalDuration / interval;
+      const increment = 100 / steps;
+      
+      const loadingInterval = setInterval(() => {
+        progress += increment;
+        
+        if (progress >= 100) {
           progress = 100;
-          clearInterval(interval);
+          clearInterval(loadingInterval);
           
           // Complete loading after a short delay
           setTimeout(() => {
@@ -32,10 +38,11 @@ const Index = () => {
             
             // Add entry animation class to body
             document.body.classList.add('page-loaded');
-          }, 500);
+          }, 200);
         }
+        
         setLoadProgress(Math.min(progress, 100));
-      }, 150);
+      }, interval);
     };
     
     // Start the loading animation
@@ -45,7 +52,7 @@ const Index = () => {
     document.documentElement.style.scrollBehavior = 'smooth';
     
     // Change document title
-    document.title = 'Cosmic Hackathon Portal';
+    document.title = 'Quantum Hackathon Portal';
     
     // Add custom CSS for global animations
     const styleSheet = document.createElement('style');
@@ -137,10 +144,6 @@ const Index = () => {
       
       .animate-reveal {
         animation: animate-reveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      }
-      
-      html {
-        scroll-behavior: smooth;
       }
       
       .perspective {
@@ -258,6 +261,16 @@ const Index = () => {
         pointer-events: none;
         font-size: 0.7rem;
       }
+      
+      /* Optimize animations */
+      @media (prefers-reduced-motion: reduce) {
+        *, ::before, ::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
     `;
     document.head.appendChild(styleSheet);
     
@@ -282,25 +295,62 @@ const Index = () => {
       }
     }
     
+    // Performance optimization: add passive event listeners
+    const passiveSupported = () => {
+      let passive = false;
+      try {
+        const options = {
+          get passive() {
+            passive = true;
+            return true;
+          }
+        };
+        window.addEventListener("test", null as any, options);
+        window.removeEventListener("test", null as any, options);
+      } catch (err) {
+        passive = false;
+      }
+      return passive;
+    };
+    
+    const passive = passiveSupported() ? { passive: true } : false;
+    
+    const originalAddEventListener = EventTarget.prototype.addEventListener;
+    EventTarget.prototype.addEventListener = function(type, listener, options) {
+      const newOptions = 
+        (type === 'touchstart' || type === 'touchmove' || type === 'wheel' || type === 'mousewheel') 
+          ? passive 
+          : options;
+      
+      return originalAddEventListener.call(this, type, listener, newOptions);
+    };
+    
     return () => {
       document.documentElement.style.scrollBehavior = 'auto';
       document.head.removeChild(styleSheet);
+      EventTarget.prototype.addEventListener = originalAddEventListener;
     };
   }, []);
   
   return (
     <ThemeProvider>
       <div className="min-h-screen w-full overflow-x-hidden">
-        {/* Loading screen */}
+        {/* Loading screen - optimized */}
         <div className={`loading-screen ${isLoading ? '' : 'hidden'}`}>
           <div className="loader-logo">
-            <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="50" cy="50" r="45" stroke="#9b87f5" strokeWidth="2" fill="none" />
-              <circle cx="50" cy="50" r="30" stroke="#d946ef" strokeWidth="2" fill="none" />
-              <circle cx="50" cy="50" r="15" stroke="#0ea5e9" strokeWidth="2" fill="none" />
+            <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="45" stroke="#9b87f5" strokeWidth="2" strokeDasharray="283" strokeDashoffset={283 - (283 * loadProgress / 100)} fill="none">
+                <animate attributeName="stroke-dashoffset" from="283" to="0" dur="2s" fill="freeze" />
+              </circle>
+              <circle cx="50" cy="50" r="30" stroke="#d946ef" strokeWidth="2" strokeDasharray="188.5" strokeDashoffset={188.5 - (188.5 * loadProgress / 100)} fill="none">
+                <animate attributeName="stroke-dashoffset" from="188.5" to="0" dur="2s" fill="freeze" />
+              </circle>
+              <circle cx="50" cy="50" r="15" stroke="#0ea5e9" strokeWidth="2" strokeDasharray="94.2" strokeDashoffset={94.2 - (94.2 * loadProgress / 100)} fill="none">
+                <animate attributeName="stroke-dashoffset" from="94.2" to="0" dur="2s" fill="freeze" />
+              </circle>
             </svg>
           </div>
-          <div className="loading-text">COSMIC PORTAL INITIALIZING</div>
+          <div className="loading-text">QUANTUM PORTAL INITIALIZING</div>
           <div className="loading-progress">{Math.round(loadProgress)}%</div>
         </div>
         <div className="loader-bar" style={{ width: `${loadProgress}%` }} />
@@ -314,8 +364,8 @@ const Index = () => {
         {/* Add scroll animation manager */}
         <ScrollManager />
         
-        {/* Enhanced navigation with theme toggle */}
-        <EnhancedNavigation />
+        {/* Quantum navigation */}
+        <QuantumNavigation />
         
         {/* Main content container */}
         <main id="main-content" className={`wormhole-container ${isLoading ? 'opacity-0' : ''}`}>
@@ -323,8 +373,8 @@ const Index = () => {
             {/* Enhanced hero section with 3D effects */}
             <EnhancedHero />
             
-            {/* Enhanced features section with interactive cards */}
-            <EnhancedFeatures />
+            {/* Quantum features section with interactive cards */}
+            <QuantumFeatures />
             
             {/* Enhanced schedule section with constellation timeline */}
             <EnhancedSchedule />

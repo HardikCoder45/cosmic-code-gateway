@@ -167,7 +167,7 @@ const ScrollManager: React.FC = () => {
       magneticElements.forEach(el => {
         const strength = Number(el.getAttribute('data-magnetic') || '0.3');
         
-        el.addEventListener('mousemove', (e) => {
+        el.addEventListener('mousemove', (e: MouseEvent) => {
           const rect = el.getBoundingClientRect();
           const x = e.clientX - rect.left - rect.width / 2;
           const y = e.clientY - rect.top - rect.height / 2;
@@ -203,7 +203,7 @@ const ScrollManager: React.FC = () => {
             const target = document.querySelector(href);
             if (target) {
               // Get position of target
-              const targetPosition = target.getBoundingClientRect().top + window.scrollY;
+              const targetPosition = (target as HTMLElement).getBoundingClientRect().top + window.scrollY;
               const startPosition = window.scrollY;
               const distance = targetPosition - startPosition;
               
