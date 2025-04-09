@@ -28,6 +28,7 @@ const ShaderBackground = () => {
       uniform vec2 u_resolution;
       uniform vec2 u_mouse;
       uniform bool u_isDark;
+      uniform float u_mousePressed;
 
       // Simplex noise function
       vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
@@ -59,6 +60,19 @@ const ShaderBackground = () => {
         return 130.0 * dot(m, g);
       }
 
+      // Vortex function
+      float vortex(vec2 uv, vec2 center, float radius, float strength) {
+        vec2 delta = uv - center;
+        float dist = length(delta);
+        float angle = strength * smoothstep(radius, 0.0, dist);
+        float c = cos(angle);
+        float s = sin(angle);
+        return snoise(vec2(
+          uv.x * c - uv.y * s,
+          uv.x * s + uv.y * c
+        ));
+      }
+
       void main() {
         vec2 st = gl_FragCoord.xy / u_resolution.xy;
         st.x *= u_resolution.x / u_resolution.y;
@@ -68,36 +82,52 @@ const ShaderBackground = () => {
         
         float distance = length(st - mouse) * 2.0;
         
-        // Multiple layers of noise
+        // Multiple layers of noise with vortex effect around mouse
         float noise1 = snoise(st * 3.0 + u_time * 0.1);
         float noise2 = snoise(st * 5.0 - u_time * 0.15);
         float noise3 = snoise(st * 8.0 + u_time * 0.05);
         
-        // Combine noise layers
-        float finalNoise = noise1 * 0.5 + noise2 * 0.3 + noise3 * 0.2;
+        // Add vortex effect near mouse position
+        float vortexEffect = vortex(st, mouse, 0.5, 3.0 + u_mousePressed * 5.0);
+        
+        // Combine noise layers with vortex
+        float finalNoise = noise1 * 0.5 + noise2 * 0.3 + noise3 * 0.2 + vortexEffect * 0.2;
         
         // Create a distortion effect near mouse position
-        float mouseEffect = smoothstep(0.3, 0.0, distance);
+        float mouseEffect = smoothstep(0.5, 0.0, distance);
         finalNoise = mix(finalNoise, finalNoise * 1.5, mouseEffect);
         
         // Color palette based on theme
         vec3 baseColor;
         vec3 accentColor;
+        vec3 highlightColor;
         
         if (u_isDark) {
             // Dark theme colors - cosmic purples and blues
             baseColor = vec3(0.05, 0.01, 0.15);
             accentColor = vec3(0.6, 0.5, 1.0); // Purple
+            highlightColor = vec3(0.8, 0.3, 1.0); // Bright purple
         } else {
             // Light theme colors - soft blues and whites
-            baseColor = vec3(0.9, 0.93, 0.98);
+            baseColor = vec3(0.92, 0.95, 0.98);
             accentColor = vec3(0.4, 0.2, 0.8); // Lighter purple
+            highlightColor = vec3(0.2, 0.1, 0.5); // Deep purple
         }
         
+        // Add time-based color shifting
+        float colorShift = sin(u_time * 0.1) * 0.1;
+        accentColor.r += colorShift;
+        accentColor.b -= colorShift * 0.5;
+        
+        // Mix colors based on noise
         vec3 color = mix(baseColor, accentColor, finalNoise * 0.6 + mouseEffect * 0.4);
         
-        // Add subtle glow around mouse
-        color += vec3(0.2, 0.1, 0.3) * mouseEffect * mouseEffect;
+        // Add subtle glow around mouse when pressed
+        color += highlightColor * mouseEffect * mouseEffect * u_mousePressed;
+        
+        // Add subtle pulse effect
+        float pulse = (sin(u_time * 0.5) + 1.0) * 0.05;
+        color += accentColor * pulse;
         
         gl_FragColor = vec4(color, 1.0);
       }
@@ -114,6 +144,7 @@ const ShaderBackground = () => {
     const resolutionUniformLocation = gl.getUniformLocation(program, 'u_resolution');
     const mouseUniformLocation = gl.getUniformLocation(program, 'u_mouse');
     const isDarkUniformLocation = gl.getUniformLocation(program, 'u_isDark');
+    const mousePressedUniformLocation = gl.getUniformLocation(program, 'u_mousePressed');
 
     // Create a buffer and put a single rectangle in it (2 triangles)
     const positionBuffer = gl.createBuffer();
@@ -134,12 +165,46 @@ const ShaderBackground = () => {
     // Setup mouse tracking
     let mouseX = 0;
     let mouseY = 0;
+    let isMousePressed = 0;
+    
     const handleMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
       mouseX = e.clientX - rect.left;
       mouseY = rect.height - (e.clientY - rect.top);
     };
+    
+    const handleMouseDown = () => {
+      isMousePressed = 1;
+    };
+    
+    const handleMouseUp = () => {
+      isMousePressed = 0;
+    };
+    
+    // Add touch support for mobile
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const rect = canvas.getBoundingClientRect();
+        mouseX = e.touches[0].clientX - rect.left;
+        mouseY = rect.height - (e.touches[0].clientY - rect.top);
+      }
+    };
+    
+    const handleTouchStart = (e: TouchEvent) => {
+      isMousePressed = 1;
+      handleTouchMove(e);
+    };
+    
+    const handleTouchEnd = () => {
+      isMousePressed = 0;
+    };
+
     document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchstart', handleTouchStart);
+    document.addEventListener('touchend', handleTouchEnd);
 
     // Handle resize
     const handleResize = () => {
@@ -168,6 +233,7 @@ const ShaderBackground = () => {
       gl.uniform2f(resolutionUniformLocation, canvas.width, canvas.height);
       gl.uniform2f(mouseUniformLocation, mouseX, mouseY);
       gl.uniform1i(isDarkUniformLocation, isDarkTheme ? 1 : 0);
+      gl.uniform1f(mousePressedUniformLocation, isMousePressed);
 
       // Set up position attribute
       gl.enableVertexAttribArray(positionAttributeLocation);
@@ -231,6 +297,11 @@ const ShaderBackground = () => {
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchend', handleTouchEnd);
       window.removeEventListener('resize', handleResize);
     };
   }, [theme]);
