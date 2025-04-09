@@ -1,402 +1,363 @@
 
-import React, { useEffect, useRef } from 'react';
-import { useTheme } from '@/providers/ThemeProvider';
+import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/providers/ThemeProvider';
+import { ExternalLink, Github, Linkedin, Twitter } from 'lucide-react';
 
 const EnhancedFooter = () => {
   const { theme } = useTheme();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const starsRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLElement>(null);
+  const [asteroids, setAsteroids] = useState<React.ReactNode[]>([]);
+  const [showBeam, setShowBeam] = useState(false);
   
-  // Create floating asteroids and parallax star field
+  // Generate floating asteroids
   useEffect(() => {
-    if (!containerRef.current || !starsRef.current) return;
-    
-    const container = containerRef.current;
-    const starsContainer = starsRef.current;
-    const containerWidth = container.offsetWidth;
-    
-    // Clear any existing elements
-    while (container.firstChild) {
-      container.removeChild(container.firstChild);
-    }
-    
-    while (starsContainer.firstChild) {
-      starsContainer.removeChild(starsContainer.firstChild);
-    }
-    
-    // Create parallax stars
-    for (let i = 0; i < 100; i++) {
-      const star = document.createElement('div');
+    const generateAsteroids = () => {
+      const newAsteroids = [];
+      const count = window.innerWidth < 768 ? 8 : 15;
       
-      // Random properties
-      const size = 1 + Math.random() * 2;
-      const posX = Math.random() * 100;
-      const posY = Math.random() * 100;
-      const depth = 0.1 + Math.random() * 0.9; // 0.1 (far) to 1.0 (close)
-      const opacity = 0.1 + depth * 0.9; // More distant stars are fainter
-      
-      // Style the star
-      star.className = 'absolute rounded-full';
-      star.style.width = `${size * depth}px`;
-      star.style.height = `${size * depth}px`;
-      star.style.left = `${posX}%`;
-      star.style.top = `${posY}%`;
-      star.style.opacity = opacity.toString();
-      star.style.backgroundColor = theme === 'dark' ? 'white' : '#9b87f5';
-      star.style.transform = `translateZ(${-100 + depth * 100}px)`;
-      
-      // Add star to container
-      starsContainer.appendChild(star);
-    }
-    
-    // Create floating asteroids
-    const asteroidTypes = [
-      // Polygon SVG shapes for asteroid variety
-      `<svg viewBox="0 0 24 24" fill="${theme === 'dark' ? 'white' : '#9b87f5'}" opacity="0.5"><path d="M12,2L2,7L12,12L22,7L12,2Z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="${theme === 'dark' ? 'white' : '#9b87f5'}" opacity="0.5"><path d="M3,12L12,5L21,12L12,19L3,12Z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="${theme === 'dark' ? 'white' : '#9b87f5'}" opacity="0.5"><path d="M12,3L20,10L17,21H7L4,10L12,3Z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="${theme === 'dark' ? 'white' : '#9b87f5'}" opacity="0.5"><path d="M12,2L19,8L22,18L12,22L2,18L5,8L12,2Z"/></svg>`
-    ];
-    
-    const emojis = ["✨", "⭐", "💫", "🌟"];
-    
-    for (let i = 0; i < 20; i++) {
-      const asteroid = document.createElement('div');
-      
-      // Random asteroid properties
-      const size = 20 + Math.floor(Math.random() * 30);
-      const speed = 20 + Math.random() * 40;
-      const startPosition = Math.random() * containerWidth;
-      const delay = Math.random() * 15;
-      const rotationSpeed = 10 + Math.random() * 40;
-      const rotationDirection = Math.random() > 0.5 ? 1 : -1;
-      const asteroidType = Math.random() > 0.7 
-        ? `<div class="text-center text-lg">${emojis[Math.floor(Math.random() * emojis.length)]}</div>`
-        : asteroidTypes[Math.floor(Math.random() * asteroidTypes.length)];
-      
-      // Style the asteroid
-      asteroid.className = 'absolute flex items-center justify-center';
-      asteroid.style.width = `${size}px`;
-      asteroid.style.height = `${size}px`;
-      asteroid.style.left = `${startPosition}px`;
-      asteroid.style.bottom = `-${size}px`;
-      asteroid.style.opacity = (0.4 + Math.random() * 0.6).toString();
-      asteroid.style.zIndex = Math.floor(Math.random() * 10).toString();
-      
-      // Animation with keyframes
-      asteroid.style.animation = `
-        float ${speed}s linear infinite, 
-        rotate ${rotationSpeed}s linear infinite ${rotationDirection > 0 ? '' : 'reverse'}
-      `;
-      asteroid.style.animationDelay = `${delay}s`;
-      
-      // Add asteroid content
-      asteroid.innerHTML = asteroidType;
-      
-      container.appendChild(asteroid);
-    }
-    
-    // Add parallax effect to stars
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!starsContainer) return;
-      
-      const { left, top, width, height } = starsContainer.getBoundingClientRect();
-      
-      // Calculate mouse position relative to the container center (-1 to 1)
-      const x = ((e.clientX - left) / width - 0.5) * 2;
-      const y = ((e.clientY - top) / height - 0.5) * 2;
-      
-      // Apply parallax effect to stars based on their depth
-      const stars = starsContainer.querySelectorAll('div');
-      stars.forEach((star, index) => {
-        const depth = 0.1 + (index % 10) / 10; // 0.1 to 1.0
-        const translateX = x * 20 * depth; // Closer stars move more
-        const translateY = y * 20 * depth;
+      for (let i = 0; i < count; i++) {
+        const size = 4 + Math.random() * 12;
+        const left = Math.random() * 100;
+        const animationDuration = 15 + Math.random() * 30;
+        const delay = Math.random() * 10;
+        const opacity = 0.1 + Math.random() * 0.3;
         
-        star.style.transform = `translate(${translateX}px, ${translateY}px) translateZ(${-100 + depth * 100}px)`;
-      });
+        const asteroidStyle: React.CSSProperties = {
+          position: 'absolute',
+          width: `${size}px`,
+          height: `${size}px`,
+          borderRadius: '50%',
+          left: `${left}%`,
+          bottom: `-${size}px`,
+          opacity: opacity,
+          background: theme === 'dark' ? 'white' : '#6E59A5',
+          boxShadow: `0 0 ${size / 2}px ${theme === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(110, 89, 165, 0.5)'}`,
+          animation: `floatUp ${animationDuration}s infinite linear`,
+          animationDelay: `${delay}s`,
+          pointerEvents: 'none',
+        };
+        
+        newAsteroids.push(<div key={i} style={asteroidStyle} />);
+      }
+      
+      setAsteroids(newAsteroids);
     };
     
-    document.addEventListener('mousemove', handleMouseMove);
+    generateAsteroids();
     
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-    };
+    // Regenerate on resize
+    window.addEventListener('resize', generateAsteroids);
+    return () => window.removeEventListener('resize', generateAsteroids);
   }, [theme]);
   
-  // Define footer navigation links
-  const footerLinks = [
-    {
-      title: "Hackathon",
-      links: [
-        { name: "Home", href: "#home" },
-        { name: "About", href: "#about" },
-        { name: "Schedule", href: "#schedule" },
-        { name: "Register", href: "#register" },
-        { name: "Sponsors", href: "#sponsors" }
-      ]
-    },
-    {
-      title: "Resources",
-      links: [
-        { name: "FAQs", href: "#" },
-        { name: "Code of Conduct", href: "#" },
-        { name: "Workshops", href: "#" },
-        { name: "API Documentation", href: "#" },
-        { name: "Partners", href: "#" }
-      ]
-    },
-    {
-      title: "Community",
-      links: [
-        { name: "Discord", href: "#" },
-        { name: "GitHub", href: "#" },
-        { name: "Twitter", href: "#" },
-        { name: "LinkedIn", href: "#" },
-        { name: "Blog", href: "#" }
-      ]
+  // Beam effect
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setShowBeam(true);
+        } else {
+          setShowBeam(false);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    
+    if (footerRef.current) {
+      observer.observe(footerRef.current);
     }
-  ];
+    
+    return () => {
+      if (footerRef.current) {
+        observer.unobserve(footerRef.current);
+      }
+    };
+  }, []);
+  
+  // Add keyframes for asteroid animation
+  useEffect(() => {
+    // Check if styles already exist
+    if (!document.getElementById('asteroid-keyframes')) {
+      const styleElement = document.createElement('style');
+      styleElement.id = 'asteroid-keyframes';
+      
+      styleElement.textContent = `
+        @keyframes floatUp {
+          0% {
+            transform: translateY(0) rotate(0deg);
+          }
+          100% {
+            transform: translateY(-1500px) rotate(360deg);
+          }
+        }
+        
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 0.5;
+          }
+          50% {
+            opacity: 1;
+          }
+        }
+        
+        @keyframes beam {
+          0% {
+            opacity: 0;
+            height: 0;
+          }
+          100% {
+            opacity: 0.7;
+            height: 100vh;
+          }
+        }
+      `;
+      
+      document.head.appendChild(styleElement);
+    }
+  }, []);
   
   return (
-    <footer className={cn(
-      "relative pt-20 pb-8 overflow-hidden transition-colors duration-500 perspective",
-      theme === 'dark' ? 'bg-transparent' : 'bg-white/5'
-    )}>
-      {/* Asteroid belt */}
-      <div 
-        ref={containerRef}
-        className="absolute inset-0 overflow-hidden pointer-events-none"
-      />
-      
-      {/* Star field with parallax effect */}
-      <div 
-        ref={starsRef}
-        className="absolute inset-0 overflow-hidden pointer-events-none perspective"
-      />
-      
-      {/* Animated aurora effect */}
-      <div className="absolute inset-x-0 bottom-0 h-40 pointer-events-none overflow-hidden">
-        <div 
-          className={cn(
-            "absolute inset-0 opacity-20",
-            theme === 'dark' ? 'bg-gradient-to-t from-cosmic-purple to-transparent' : 'bg-gradient-to-t from-cosmic-deepPurple/30 to-transparent'
-          )}
-        ></div>
-        <div 
-          className="absolute inset-0 opacity-10 bg-gradient-to-r from-cosmic-blue via-cosmic-purple to-cosmic-pink animate-pulse"
-          style={{ animationDuration: '5s' }}
-        ></div>
+    <footer 
+      ref={footerRef}
+      className={cn(
+        "relative pt-20 overflow-hidden",
+        theme === 'dark' ? 'bg-black' : 'bg-slate-100'
+      )}
+    >
+      {/* Floating asteroids */}
+      <div className="asteroid-container absolute inset-0 overflow-hidden pointer-events-none">
+        {asteroids}
       </div>
       
-      {/* Main footer content */}
-      <div className="relative z-10 container mx-auto px-4">
-        <div className={cn(
-          "max-w-6xl mx-auto rounded-2xl p-8 mb-12 transition-all duration-500",
-          theme === 'dark'
-            ? 'bg-black/30 border border-white/5 backdrop-blur-sm'
-            : 'bg-white/50 border border-cosmic-purple/10 backdrop-blur-sm'
-        )}>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-            {/* Branding section */}
-            <div className="md:col-span-1">
-              <div className={cn(
-                "font-bold text-2xl mb-4 transition-colors duration-500",
-                theme === 'dark' ? 'text-cosmic-purple text-glow' : 'text-cosmic-deepPurple'
-              )}>
-                <span className="inline-block">
-                  Cosmic Hackathon
-                  <span className="absolute -top-1 right-0 w-1 h-1 rounded-full bg-cosmic-pink animate-pulse"></span>
-                </span>
-              </div>
+      {/* Light beam effect */}
+      {showBeam && (
+        <div 
+          className="absolute left-1/2 bottom-full w-40 -ml-20 pointer-events-none" 
+          style={{
+            background: `linear-gradient(to top, ${theme === 'dark' ? 'rgba(155, 135, 245, 0.2)' : 'rgba(110, 89, 165, 0.1)'} 0%, transparent 100%)`,
+            height: '100vh',
+            opacity: 0.7,
+            animation: 'beam 2s ease-out forwards',
+          }}
+        />
+      )}
+      
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 py-12">
+          {/* Brand and mission */}
+          <div className="md:col-span-2">
+            <h2 className={cn(
+              "text-2xl font-bold mb-4",
+              theme === 'dark' ? 'text-cosmic-purple' : 'text-cosmic-deepPurple'
+            )}>
+              Quantum Hackathon Portal
+            </h2>
+            
+            <p className={cn(
+              "mb-6 max-w-md",
+              theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+            )}>
+              Pushing the boundaries of innovation through collaborative coding. 
+              Our mission is to create an environment where technology meets creativity to solve tomorrow's challenges.
+            </p>
+            
+            <div className="flex space-x-4">
+              <a 
+                href="#" 
+                className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+                  theme === 'dark' 
+                    ? 'bg-cosmic-purple/20 text-white hover:bg-cosmic-purple/40' 
+                    : 'bg-cosmic-purple/10 text-cosmic-deepPurple hover:bg-cosmic-purple/20'
+                )}
+                aria-label="Twitter"
+              >
+                <Twitter size={20} />
+              </a>
               
-              <p className={cn(
-                "mb-6 transition-colors duration-500",
-                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-              )}>
-                The ultimate coding journey through the digital cosmos. 
-                Innovation, collaboration, and technology unite to create something extraordinary.
-              </p>
+              <a 
+                href="#" 
+                className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+                  theme === 'dark' 
+                    ? 'bg-cosmic-purple/20 text-white hover:bg-cosmic-purple/40' 
+                    : 'bg-cosmic-purple/10 text-cosmic-deepPurple hover:bg-cosmic-purple/20'
+                )}
+                aria-label="GitHub"
+              >
+                <Github size={20} />
+              </a>
               
-              <div className="flex space-x-4">
-                {['Twitter', 'GitHub', 'Discord', 'LinkedIn'].map(platform => (
+              <a 
+                href="#" 
+                className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+                  theme === 'dark' 
+                    ? 'bg-cosmic-purple/20 text-white hover:bg-cosmic-purple/40' 
+                    : 'bg-cosmic-purple/10 text-cosmic-deepPurple hover:bg-cosmic-purple/20'
+                )}
+                aria-label="LinkedIn"
+              >
+                <Linkedin size={20} />
+              </a>
+            </div>
+          </div>
+          
+          {/* Quick Links */}
+          <div className="md:col-span-1">
+            <h3 className={cn(
+              "text-lg font-semibold mb-4",
+              theme === 'dark' ? 'text-white' : 'text-cosmic-deepPurple'
+            )}>
+              Quick Links
+            </h3>
+            
+            <ul className="space-y-3">
+              {['About', 'Schedule', 'Register', 'Sponsors', 'FAQs', 'Contact'].map((item, i) => (
+                <li key={i}>
+                  <a 
+                    href={`#${item.toLowerCase()}`} 
+                    className={cn(
+                      "transition-colors hover:underline flex items-center",
+                      theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-cosmic-deepPurple'
+                    )}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-cosmic-purple inline-block mr-2"></span>
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Resources */}
+          <div className="md:col-span-1">
+            <h3 className={cn(
+              "text-lg font-semibold mb-4",
+              theme === 'dark' ? 'text-white' : 'text-cosmic-deepPurple'
+            )}>
+              Resources
+            </h3>
+            
+            <ul className="space-y-3">
+              {['Documentation', 'Previous Winners', 'Mentors', 'Sponsors', 'Blog', 'Newsletter'].map((item, i) => (
+                <li key={i}>
                   <a 
                     href="#" 
-                    key={platform}
-                    data-hoverable="true"
                     className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300",
-                      theme === 'dark'
-                        ? 'bg-cosmic-purple/20 text-white hover:bg-cosmic-purple/30'
-                        : 'bg-cosmic-purple/10 text-cosmic-deepPurple hover:bg-cosmic-purple/20'
+                      "transition-colors hover:underline flex items-center",
+                      theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-cosmic-deepPurple'
                     )}
-                    aria-label={platform}
                   >
-                    {/* Simple text abbreviation instead of icons */}
-                    {platform.charAt(0)}
+                    <span className="w-1.5 h-1.5 rounded-full bg-cosmic-purple inline-block mr-2"></span>
+                    {item}
                   </a>
-                ))}
-              </div>
-            </div>
-            
-            {/* Navigation sections */}
-            {footerLinks.map((section, index) => (
-              <div key={index} className="md:col-span-1">
-                <h3 className={cn(
-                  "text-lg font-bold mb-4 transition-colors duration-500",
-                  theme === 'dark' ? 'text-white' : 'text-cosmic-darkPurple'
-                )}>
-                  {section.title}
-                </h3>
-                
-                <ul className="space-y-2">
-                  {section.links.map((link, linkIndex) => (
-                    <li key={linkIndex}>
-                      <a 
-                        href={link.href}
-                        data-hoverable="true" 
-                        className={cn(
-                          "transition-colors duration-300 inline-block relative",
-                          "after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left",
-                          theme === 'dark' 
-                            ? 'text-gray-400 hover:text-cosmic-purple after:bg-cosmic-purple/50' 
-                            : 'text-gray-600 hover:text-cosmic-deepPurple after:bg-cosmic-deepPurple/50'
-                        )}
-                      >
-                        {link.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
         
-        {/* Newsletter & subscription */}
+        {/* Newsletter */}
         <div className={cn(
-          "max-w-2xl mx-auto mb-12 rounded-2xl p-6 transition-all duration-500",
-          theme === 'dark'
-            ? 'bg-black/40 border border-white/10 backdrop-blur-md'
-            : 'bg-white/60 border border-cosmic-purple/10 backdrop-blur-md'
+          "py-8 my-8 border-t border-b",
+          theme === 'dark' ? 'border-white/10' : 'border-cosmic-purple/10'
         )}>
-          <div className="text-center mb-4">
+          <div className="max-w-xl mx-auto text-center">
             <h3 className={cn(
-              "text-xl font-bold mb-2 transition-colors duration-500",
-              theme === 'dark' ? 'text-cosmic-purple' : 'text-cosmic-deepPurple'
+              "text-xl font-semibold mb-3",
+              theme === 'dark' ? 'text-white' : 'text-cosmic-deepPurple'
             )}>
-              Stay Updated
+              Stay Connected
             </h3>
             
             <p className={cn(
-              "transition-colors duration-500",
+              "mb-6",
               theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
             )}>
-              Subscribe to our newsletter for hackathon updates and future events
+              Subscribe to our newsletter for updates on future events, technology trends, and innovation opportunities.
             </p>
-          </div>
-          
-          <form className="flex flex-col sm:flex-row gap-2">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className={cn(
-                "flex-grow rounded-full py-2 px-4 transition-all duration-300 focus:outline-none focus:ring-2",
-                theme === 'dark' 
-                  ? 'bg-cosmic-darkPurple/40 border border-cosmic-purple/30 text-white focus:ring-cosmic-purple' 
-                  : 'bg-white border border-cosmic-purple/20 text-cosmic-darkPurple focus:ring-cosmic-deepPurple'
-              )}
-            />
             
-            <button
-              type="submit"
-              data-hoverable="true"
-              className={cn(
-                "rounded-full px-5 py-2 transition-all duration-300",
-                theme === 'dark' 
-                  ? 'bg-cosmic-purple hover:bg-cosmic-deepPurple text-white' 
-                  : 'bg-cosmic-deepPurple hover:bg-cosmic-purple text-white'
-              )}
-            >
-              Subscribe
-            </button>
-          </form>
+            <form className="flex flex-col sm:flex-row gap-3">
+              <input 
+                type="email" 
+                placeholder="Your email address" 
+                className={cn(
+                  "px-4 py-2 rounded-lg flex-grow",
+                  theme === 'dark' 
+                    ? 'bg-black/30 border border-white/10 text-white' 
+                    : 'bg-white border border-cosmic-purple/10 text-cosmic-deepPurple'
+                )}
+              />
+              
+              <button
+                type="submit"
+                className={cn(
+                  "px-6 py-2 rounded-lg font-medium transition-colors",
+                  theme === 'dark' 
+                    ? 'bg-cosmic-purple text-white hover:bg-cosmic-deepPurple' 
+                    : 'bg-cosmic-deepPurple text-white hover:bg-cosmic-purple'
+                )}
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
         </div>
         
-        {/* Footer bottom bar */}
-        <div className={cn(
-          "border-t pt-8 text-center transition-colors duration-500",
-          theme === 'dark' ? 'border-cosmic-purple/20 text-gray-500' : 'border-cosmic-purple/10 text-gray-500'
-        )}>
-          <div className="flex flex-col sm:flex-row items-center justify-between text-sm">
-            <p>© 2025 Cosmic Hackathon. All rights reserved.</p>
-            
-            <div className="flex space-x-4 mt-2 sm:mt-0">
-              <a href="#" className={cn(
-                "transition-colors duration-300",
-                theme === 'dark' ? 'text-gray-500 hover:text-cosmic-purple' : 'text-gray-500 hover:text-cosmic-deepPurple'
-              )}>
-                Privacy Policy
-              </a>
-              <a href="#" className={cn(
-                "transition-colors duration-300",
-                theme === 'dark' ? 'text-gray-500 hover:text-cosmic-purple' : 'text-gray-500 hover:text-cosmic-deepPurple'
-              )}>
-                Terms of Service
-              </a>
-              <a href="#" className={cn(
-                "transition-colors duration-300",
-                theme === 'dark' ? 'text-gray-500 hover:text-cosmic-purple' : 'text-gray-500 hover:text-cosmic-deepPurple'
-              )}>
-                Contact
-              </a>
-            </div>
+        {/* Copyright */}
+        <div className="py-6 text-center">
+          <p className={cn(
+            "text-sm",
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+          )}>
+            © {new Date().getFullYear()} Quantum Hackathon Portal. All rights reserved.
+          </p>
+          
+          <div className="mt-2 flex items-center justify-center space-x-4 text-sm">
+            <a 
+              href="#" 
+              className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-cosmic-deepPurple'}
+            >
+              Privacy Policy
+            </a>
+            <span className={theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}>•</span>
+            <a 
+              href="#" 
+              className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-cosmic-deepPurple'}
+            >
+              Terms of Service
+            </a>
+            <span className={theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}>•</span>
+            <a 
+              href="#" 
+              className={theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-cosmic-deepPurple'}
+            >
+              Cookie Policy
+            </a>
           </div>
         </div>
       </div>
       
-      {/* Animated shooting star */}
-      <div 
-        className="shooting-star absolute w-0.5 h-0.5 bg-white rounded-full pointer-events-none"
-        style={{
-          left: '-10px',
-          top: '10%',
-          boxShadow: '0 0 10px 2px white',
-          animation: 'shooting-star 3s linear infinite',
-          animationDelay: '1s'
-        }}
-      ></div>
-      
-      <style jsx>{`
-        @keyframes float {
-          0% { transform: translate(0, 0) rotate(0deg); }
-          25% { transform: translate(5px, -30vh) rotate(90deg); }
-          50% { transform: translate(15px, -60vh) rotate(180deg); }
-          75% { transform: translate(5px, -90vh) rotate(270deg); }
-          100% { transform: translate(0, -120vh) rotate(360deg); }
-        }
-        
-        @keyframes rotate {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        
-        @keyframes shooting-star {
-          0% { 
-            transform: translateX(0) translateY(0); 
-            opacity: 1;
-          }
-          70% { 
-            transform: translateX(calc(100vw + 100px)) translateY(calc(50vh + 50px));
-            opacity: 1;
-          }
-          100% { 
-            transform: translateX(calc(100vw + 200px)) translateY(calc(100vh + 100px));
-            opacity: 0;
-          }
-        }
-      `}</style>
+      {/* Cosmic decoration at the bottom */}
+      <div className={cn(
+        "h-24 relative z-0 overflow-hidden",
+        theme === 'dark' ? 'bg-black' : 'bg-slate-100'
+      )}>
+        <div className="absolute inset-0 flex justify-center">
+          <div
+            className={cn(
+              "w-full h-24 -mt-12 rounded-full opacity-10",
+              theme === 'dark' ? 'bg-cosmic-purple' : 'bg-cosmic-deepPurple'
+            )}
+            style={{
+              filter: 'blur(40px)',
+              transform: 'scale(1.5, 0.5)',
+            }}
+          />
+        </div>
+      </div>
     </footer>
   );
 };

@@ -11,6 +11,9 @@ import EnhancedRegister from '@/components/EnhancedRegister';
 import EnhancedSponsors from '@/components/EnhancedSponsors';
 import EnhancedFooter from '@/components/EnhancedFooter';
 import ScrollManager from '@/components/ScrollManager';
+import EnhancedFAQ from '@/components/EnhancedFAQ';
+import EnhancedTestimonials from '@/components/EnhancedTestimonials';
+import EnhancedContact from '@/components/EnhancedContact';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -305,8 +308,9 @@ const Index = () => {
             return true;
           }
         };
-        window.addEventListener("test", null as any, options);
-        window.removeEventListener("test", null as any, options);
+        // Use a standard event name instead of "test"
+        window.addEventListener("touchstart", null as any, options);
+        window.removeEventListener("touchstart", null as any, options);
       } catch (err) {
         passive = false;
       }
@@ -376,14 +380,23 @@ const Index = () => {
             {/* Quantum features section with interactive cards */}
             <QuantumFeatures />
             
+            {/* Enhanced testimonials section */}
+            <EnhancedTestimonials />
+            
             {/* Enhanced schedule section with constellation timeline */}
             <EnhancedSchedule />
+            
+            {/* Enhanced FAQ section */}
+            <EnhancedFAQ />
             
             {/* Enhanced registration with black hole effect */}
             <EnhancedRegister />
             
             {/* Enhanced sponsors section with interactive cards */}
             <EnhancedSponsors />
+            
+            {/* Enhanced contact section */}
+            <EnhancedContact />
           </div>
         </main>
         
