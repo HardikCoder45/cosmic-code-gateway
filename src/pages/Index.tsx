@@ -1,35 +1,25 @@
-
-import React, { useEffect, useState, lazy, Suspense } from 'react';
+import React, { useEffect, useState } from 'react';
 import ShaderBackground from '@/components/ShaderBackground';
 import CustomCursor from '@/components/CustomCursor';
 import QuantumNavigation from '@/components/QuantumNavigation';
 import EnhancedHero from '@/components/EnhancedHero';
 import QuantumFeatures from '@/components/QuantumFeatures';
+import EnhancedSchedule from '@/components/EnhancedSchedule';
 import EnhancedRegister from '@/components/EnhancedRegister';
 import EnhancedSponsors from '@/components/EnhancedSponsors';
 import EnhancedFooter from '@/components/EnhancedFooter';
 import ScrollManager from '@/components/ScrollManager';
+import EnhancedFAQ from '@/components/EnhancedFAQ';
+import EnhancedTestimonials from '@/components/EnhancedTestimonials';
+import EnhancedContact from '@/components/EnhancedContact';
+import ImagesGallery from '@/components/ImagesGallery';
+import ParticleCanvas from '@/components/ParticleSystem/ParticleCanvas';
+import SocialProof from '@/components/SocialProof';
+import PrizesShowcase from '@/components/PrizesShowcase';
+import JudgingCriteria from '@/components/JudgingCriteria';
+import TeamFormation from '@/components/TeamFormation';
+import DeveloperResources from '@/components/DeveloperResources';
 import { motion } from 'framer-motion';
-
-// Lazy load components that aren't immediately visible
-const EnhancedSchedule = lazy(() => import('@/components/EnhancedSchedule'));
-const EnhancedFAQ = lazy(() => import('@/components/EnhancedFAQ'));
-const EnhancedTestimonials = lazy(() => import('@/components/EnhancedTestimonials'));
-const EnhancedContact = lazy(() => import('@/components/EnhancedContact'));
-const ImagesGallery = lazy(() => import('@/components/ImagesGallery'));
-const ParticleCanvas = lazy(() => import('@/components/ParticleSystem/ParticleCanvas'));
-const SocialProof = lazy(() => import('@/components/SocialProof'));
-const PrizesShowcase = lazy(() => import('@/components/PrizesShowcase'));
-const JudgingCriteria = lazy(() => import('@/components/JudgingCriteria'));
-const TeamFormation = lazy(() => import('@/components/TeamFormation'));
-const DeveloperResources = lazy(() => import('@/components/DeveloperResources'));
-
-// Loading fallback component
-const LoadingFallback = () => (
-  <div className="flex justify-center items-center min-h-[200px]">
-    <div className="w-8 h-8 border-2 border-cosmic-purple border-t-transparent rounded-full animate-spin"></div>
-  </div>
-);
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -39,8 +29,8 @@ const Index = () => {
     // Optimize the loading animation
     const startLoading = () => {
       let progress = 0;
-      const totalDuration = 1500; // Reduced from 2000ms
-      const interval = 50; // Update every 50ms instead of 100ms
+      const totalDuration = 2000; // 2 seconds total loading time
+      const interval = 100; // Update every 100ms
       const steps = totalDuration / interval;
       const increment = 100 / steps;
       
@@ -51,11 +41,13 @@ const Index = () => {
           progress = 100;
           clearInterval(loadingInterval);
           
-          // Complete loading after a shorter delay
+          // Complete loading after a short delay
           setTimeout(() => {
             setIsLoading(false);
+            
+            // Add entry animation class to body
             document.body.classList.add('page-loaded');
-          }, 100); // Reduced from 200ms
+          }, 200);
         }
         
         setLoadProgress(Math.min(progress, 100));
@@ -71,130 +63,230 @@ const Index = () => {
     // Change document title
     document.title = 'Quantum Hackathon Portal';
     
-    // Use a more efficient way to add global styles
-    if (!document.getElementById('quantum-animations-style')) {
-      const styleSheet = document.createElement('style');
-      styleSheet.id = 'quantum-animations-style';
+    // Add custom CSS for global animations
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+      @keyframes animate-scale-in {
+        0% { transform: scale(0.95); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+      }
       
-      // Optimized animations with reduced complexity
-      styleSheet.textContent = `
-        @keyframes animate-scale-in {
-          from { transform: scale(0.95); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-        
-        @keyframes animate-fade-up {
-          from { transform: translateY(20px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-        
-        @keyframes animate-fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        @keyframes animate-slide-in {
-          from { transform: translateX(-50px); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes animate-glitch {
-          0%, 100% { transform: translate(0); }
-          20% { transform: translate(-2px, 2px); }
-          40% { transform: translate(1px, -1px); }
-          60% { transform: translate(-1px, 1px); }
-          80% { transform: translate(2px, -2px); }
-        }
-        
-        @keyframes animate-reveal {
-          from { 
-            transform: translateY(5px);
-            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 0%);
-            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 0%);
-          }
-          to {
-            transform: translateY(0);
-            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 100%, rgba(0,0,0,0) 100%);
-            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 100%, rgba(0,0,0,0) 100%);
-          }
-        }
-        
-        .animate-scale-in { animation: animate-scale-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .animate-fade-up { animation: animate-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .animate-fade-in { animation: animate-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .animate-slide-in { animation: animate-slide-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .animate-glitch { animation: animate-glitch 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
-        .animate-reveal { animation: animate-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        
-        .perspective { perspective: 1000px; }
-        
-        body { cursor: none; }
-        @media (max-width: 768px) { body { cursor: auto; } }
-        
-        @keyframes glitch {
-          0%, 100% { transform: translate(0); text-shadow: 0 0 0 #00fffc; }
-          10% { transform: translate(-2px, 2px); text-shadow: -1px 0 0 #ff00fc, 1px 0 0 #00fffc; }
-          20% { transform: translate(2px, -2px); text-shadow: 1px 0 0 #ff00fc, -1px 0 0 #00fffc; }
-        }
-        
-        .text-glitch:hover { animation: glitch 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
-        
-        .page-loaded .wormhole-container { animation: fadeIn 0.8s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .loader-bar {
-          height: 4px;
-          background: linear-gradient(to right, #9b87f5, #d946ef);
-          position: fixed;
-          top: 0;
-          left: 0;
-          z-index: 999;
-          transition: width 0.3s ease;
-        }
-        
-        .loading-screen {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: black;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          z-index: 998;
-          transition: opacity 0.4s ease, visibility 0.4s;
-        }
-        
-        .loading-screen.hidden { opacity: 0; visibility: hidden; }
-        .loading-text { font-family: monospace; font-size: 1.2rem; color: #9b87f5; margin-top: 1rem; }
-        .loading-progress { color: #d946ef; font-family: monospace; font-size: 1rem; margin-top: 0.5rem; }
-        .binary-code { position: absolute; font-family: monospace; color: rgba(155, 135, 245, 0.2); pointer-events: none; font-size: 0.7rem; }
-        
-        @media (prefers-reduced-motion: reduce) {
-          *, ::before, ::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-            scroll-behavior: auto !important;
-          }
-        }
-      `;
+      @keyframes animate-fade-up {
+        0% { transform: translateY(20px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
+      }
       
-      document.head.appendChild(styleSheet);
-    }
+      @keyframes animate-fade-in {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+      }
+      
+      @keyframes animate-slide-in {
+        0% { transform: translateX(-50px); opacity: 0; }
+        100% { transform: translateX(0); opacity: 1; }
+      }
+      
+      @keyframes animate-glitch {
+        0% {
+          clip-path: inset(40% 0 61% 0);
+          transform: translate(-2px, 2px);
+        }
+        20% {
+          clip-path: inset(92% 0 1% 0);
+          transform: translate(1px, 3px);
+        }
+        40% {
+          clip-path: inset(43% 0 1% 0);
+          transform: translate(-1px, -3px);
+        }
+        60% {
+          clip-path: inset(25% 0 58% 0);
+          transform: translate(3px, 1px);
+        }
+        80% {
+          clip-path: inset(54% 0 7% 0);
+          transform: translate(-3px, -2px);
+        }
+        100% {
+          clip-path: inset(58% 0 43% 0);
+          transform: translate(2px, -1px);
+        }
+      }
+      
+      @keyframes animate-reveal {
+        0% {
+          transform: translateY(0) skewY(0);
+          mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 0%);
+          -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 0%);
+        }
+        30% {
+          transform: translateY(5px) skewY(2deg);
+          mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 90%);
+          -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 90%);
+        }
+        100% {
+          transform: translateY(0) skewY(0);
+          mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 100%, rgba(0,0,0,0) 100%);
+          -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 100%, rgba(0,0,0,0) 100%);
+        }
+      }
+      
+      .animate-scale-in {
+        animation: animate-scale-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      
+      .animate-fade-up {
+        animation: animate-fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      
+      .animate-fade-in {
+        animation: animate-fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      
+      .animate-slide-in {
+        animation: animate-slide-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      
+      .animate-glitch {
+        animation: animate-glitch 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+      }
+      
+      .animate-reveal {
+        animation: animate-reveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      
+      .perspective {
+        perspective: 1000px;
+      }
+      
+      /* Remove default cursor when custom cursor is active */
+      body {
+        cursor: none;
+      }
+      
+      /* But keep cursor on mobile devices */
+      @media (max-width: 768px) {
+        body {
+          cursor: auto;
+        }
+      }
+      
+      /* Keyframes for text glitching effect */
+      @keyframes glitch {
+        0% {
+          transform: translate(0);
+          text-shadow: 0 0 0 #00fffc;
+        }
+        2% {
+          transform: translate(-2px, 2px);
+          text-shadow: -1px 0 0 #ff00fc, 1px 0 0 #00fffc;
+        }
+        4% {
+          transform: translate(-2px, -2px);
+          text-shadow: 1px 0 0 #ff00fc, -1px 0 0 #00fffc;
+        }
+        6% {
+          transform: translate(2px, 2px);
+          text-shadow: -1px 0 0 #ff00fc, 1px 0 0 #00fffc;
+        }
+        8% {
+          transform: translate(2px, -2px);
+          text-shadow: 1px 0 0 #ff00fc, -1px 0 0 #00fffc;
+        }
+        9% {
+          transform: translate(0);
+          text-shadow: 0 0 0 #00fffc;
+        }
+        100% {
+          transform: translate(0);
+          text-shadow: 0 0 0 #00fffc;
+        }
+      }
+      
+      .text-glitch:hover {
+        animation: glitch 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+      }
+      
+      /* Entry animation for the body */
+      .page-loaded .wormhole-container {
+        animation: fadeIn 1s ease-out forwards;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      /* Loading animation */
+      .loader-bar {
+        height: 4px;
+        background: linear-gradient(to right, #9b87f5, #d946ef);
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 999;
+        transition: width 0.4s ease;
+      }
+      
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 998;
+        transition: opacity 0.5s ease, visibility 0.5s;
+      }
+      
+      .loading-screen.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+      
+      .loading-text {
+        font-family: monospace;
+        font-size: 1.2rem;
+        color: #9b87f5;
+        margin-top: 1rem;
+      }
+      
+      .loading-progress {
+        color: #d946ef;
+        font-family: monospace;
+        font-size: 1rem;
+        margin-top: 0.5rem;
+      }
+      
+      /* Binary code background */
+      .binary-code {
+        position: absolute;
+        font-family: monospace;
+        color: rgba(155, 135, 245, 0.2);
+        pointer-events: none;
+        font-size: 0.7rem;
+      }
+      
+      /* Optimize animations */
+      @media (prefers-reduced-motion: reduce) {
+        *, ::before, ::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    `;
+    document.head.appendChild(styleSheet);
     
-    // Create binary code background for loading screen with fewer elements
+    // Create binary code background for loading screen
     const loadingScreen = document.querySelector('.loading-screen');
     if (loadingScreen) {
-      // Clear any existing particles
-      const existingParticles = loadingScreen.querySelectorAll('.binary-code');
-      existingParticles.forEach(particle => particle.remove());
-      
-      // Create fewer particles
-      const particleCount = 20; // Reduced from 50
-      for (let i = 0; i < particleCount; i++) {
+      for (let i = 0; i < 50; i++) {
         const binary = document.createElement('div');
         binary.classList.add('binary-code');
         binary.style.left = `${Math.random() * 100}%`;
@@ -212,7 +304,7 @@ const Index = () => {
       }
     }
     
-    // Performance optimization for event listeners
+    // Performance optimization: add passive event listeners
     const passiveSupported = () => {
       let passive = false;
       try {
@@ -222,6 +314,7 @@ const Index = () => {
             return true;
           }
         });
+        // Use a standard event name instead of "test"
         window.addEventListener("touchstart", null as any, options);
         window.removeEventListener("touchstart", null as any, options);
       } catch (err) {
@@ -244,10 +337,7 @@ const Index = () => {
     
     return () => {
       document.documentElement.style.scrollBehavior = 'auto';
-      const styleSheet = document.getElementById('quantum-animations-style');
-      if (styleSheet) {
-        document.head.removeChild(styleSheet);
-      }
+      document.head.removeChild(styleSheet);
       EventTarget.prototype.addEventListener = originalAddEventListener;
     };
   }, []);
@@ -258,9 +348,15 @@ const Index = () => {
       <div className={`loading-screen ${isLoading ? '' : 'hidden'}`}>
         <div className="loader-logo">
           <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="45" stroke="#9b87f5" strokeWidth="2" strokeDasharray="283" strokeDashoffset={283 - (283 * loadProgress / 100)} fill="none" />
-            <circle cx="50" cy="50" r="30" stroke="#d946ef" strokeWidth="2" strokeDasharray="188.5" strokeDashoffset={188.5 - (188.5 * loadProgress / 100)} fill="none" />
-            <circle cx="50" cy="50" r="15" stroke="#0ea5e9" strokeWidth="2" strokeDasharray="94.2" strokeDashoffset={94.2 - (94.2 * loadProgress / 100)} fill="none" />
+            <circle cx="50" cy="50" r="45" stroke="#9b87f5" strokeWidth="2" strokeDasharray="283" strokeDashoffset={283 - (283 * loadProgress / 100)} fill="none">
+              <animate attributeName="stroke-dashoffset" from="283" to="0" dur="2s" fill="freeze" />
+            </circle>
+            <circle cx="50" cy="50" r="30" stroke="#d946ef" strokeWidth="2" strokeDasharray="188.5" strokeDashoffset={188.5 - (188.5 * loadProgress / 100)} fill="none">
+              <animate attributeName="stroke-dashoffset" from="188.5" to="0" dur="2s" fill="freeze" />
+            </circle>
+            <circle cx="50" cy="50" r="15" stroke="#0ea5e9" strokeWidth="2" strokeDasharray="94.2" strokeDashoffset={94.2 - (94.2 * loadProgress / 100)} fill="none">
+              <animate attributeName="stroke-dashoffset" from="94.2" to="0" dur="2s" fill="freeze" />
+            </circle>
           </svg>
         </div>
         <div className="loading-text">QUANTUM PORTAL INITIALIZING</div>
@@ -277,11 +373,9 @@ const Index = () => {
       {/* Add scroll animation manager */}
       <ScrollManager />
       
-      {/* Interactive particle background - lazy loaded */}
+      {/* Interactive particle background */}
       <div className="fixed inset-0 pointer-events-none">
-        <Suspense fallback={null}>
-          {!isLoading && <ParticleCanvas />}
-        </Suspense>
+        <ParticleCanvas />
       </div>
       
       {/* Quantum navigation */}
@@ -301,50 +395,32 @@ const Index = () => {
           {/* Quantum features section with interactive cards */}
           <QuantumFeatures />
           
-          {/* Prizes showcase section - lazy loaded */}
-          <Suspense fallback={<LoadingFallback />}>
-            <PrizesShowcase />
-          </Suspense>
+          {/* Prizes showcase section */}
+          <PrizesShowcase />
           
-          {/* Enhanced schedule section with constellation timeline - lazy loaded */}
-          <Suspense fallback={<LoadingFallback />}>
-            <EnhancedSchedule />
-          </Suspense>
+          {/* Enhanced schedule section with constellation timeline */}
+          <EnhancedSchedule />
           
-          {/* Judging criteria section - lazy loaded */}
-          <Suspense fallback={<LoadingFallback />}>
-            <JudgingCriteria />
-          </Suspense>
+          {/* Judging criteria section */}
+          <JudgingCriteria />
           
-          {/* Team formation section - lazy loaded */}
-          <Suspense fallback={<LoadingFallback />}>
-            <TeamFormation />
-          </Suspense>
+          {/* Team formation section */}
+          <TeamFormation />
           
-          {/* Developer resources section - lazy loaded */}
-          <Suspense fallback={<LoadingFallback />}>
-            <DeveloperResources />
-          </Suspense>
+          {/* Developer resources section */}
+          <DeveloperResources />
           
-          {/* Enhanced image gallery - lazy loaded */}
-          <Suspense fallback={<LoadingFallback />}>
-            <ImagesGallery />
-          </Suspense>
+          {/* Enhanced image gallery */}
+          <ImagesGallery />
           
-          {/* Social proof section with testimonials - lazy loaded */}
-          <Suspense fallback={<LoadingFallback />}>
-            <SocialProof />
-          </Suspense>
+          {/* Social proof section with testimonials */}
+          <SocialProof />
           
-          {/* Enhanced testimonials section - lazy loaded */}
-          <Suspense fallback={<LoadingFallback />}>
-            <EnhancedTestimonials />
-          </Suspense>
+          {/* Enhanced testimonials section */}
+          <EnhancedTestimonials />
           
-          {/* Enhanced FAQ section - lazy loaded */}
-          <Suspense fallback={<LoadingFallback />}>
-            <EnhancedFAQ />
-          </Suspense>
+          {/* Enhanced FAQ section */}
+          <EnhancedFAQ />
           
           {/* Enhanced registration with black hole effect */}
           <EnhancedRegister />
@@ -352,10 +428,8 @@ const Index = () => {
           {/* Enhanced sponsors section with interactive cards */}
           <EnhancedSponsors />
           
-          {/* Enhanced contact section - lazy loaded */}
-          <Suspense fallback={<LoadingFallback />}>
-            <EnhancedContact />
-          </Suspense>
+          {/* Enhanced contact section */}
+          <EnhancedContact />
         </motion.div>
       </main>
       
