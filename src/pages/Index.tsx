@@ -1,6 +1,4 @@
-
 import React, { useEffect, useState } from 'react';
-import { ThemeProvider } from '@/providers/ThemeProvider';
 import ShaderBackground from '@/components/ShaderBackground';
 import CustomCursor from '@/components/CustomCursor';
 import QuantumNavigation from '@/components/QuantumNavigation';
@@ -345,101 +343,99 @@ const Index = () => {
   }, []);
   
   return (
-    <ThemeProvider>
-      <div className="min-h-screen w-full overflow-x-hidden">
-        {/* Loading screen - optimized */}
-        <div className={`loading-screen ${isLoading ? '' : 'hidden'}`}>
-          <div className="loader-logo">
-            <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="50" cy="50" r="45" stroke="#9b87f5" strokeWidth="2" strokeDasharray="283" strokeDashoffset={283 - (283 * loadProgress / 100)} fill="none">
-                <animate attributeName="stroke-dashoffset" from="283" to="0" dur="2s" fill="freeze" />
-              </circle>
-              <circle cx="50" cy="50" r="30" stroke="#d946ef" strokeWidth="2" strokeDasharray="188.5" strokeDashoffset={188.5 - (188.5 * loadProgress / 100)} fill="none">
-                <animate attributeName="stroke-dashoffset" from="188.5" to="0" dur="2s" fill="freeze" />
-              </circle>
-              <circle cx="50" cy="50" r="15" stroke="#0ea5e9" strokeWidth="2" strokeDasharray="94.2" strokeDashoffset={94.2 - (94.2 * loadProgress / 100)} fill="none">
-                <animate attributeName="stroke-dashoffset" from="94.2" to="0" dur="2s" fill="freeze" />
-              </circle>
-            </svg>
-          </div>
-          <div className="loading-text">QUANTUM PORTAL INITIALIZING</div>
-          <div className="loading-progress">{Math.round(loadProgress)}%</div>
+    <div className="min-h-screen w-full overflow-x-hidden">
+      {/* Loading screen - optimized */}
+      <div className={`loading-screen ${isLoading ? '' : 'hidden'}`}>
+        <div className="loader-logo">
+          <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="45" stroke="#9b87f5" strokeWidth="2" strokeDasharray="283" strokeDashoffset={283 - (283 * loadProgress / 100)} fill="none">
+              <animate attributeName="stroke-dashoffset" from="283" to="0" dur="2s" fill="freeze" />
+            </circle>
+            <circle cx="50" cy="50" r="30" stroke="#d946ef" strokeWidth="2" strokeDasharray="188.5" strokeDashoffset={188.5 - (188.5 * loadProgress / 100)} fill="none">
+              <animate attributeName="stroke-dashoffset" from="188.5" to="0" dur="2s" fill="freeze" />
+            </circle>
+            <circle cx="50" cy="50" r="15" stroke="#0ea5e9" strokeWidth="2" strokeDasharray="94.2" strokeDashoffset={94.2 - (94.2 * loadProgress / 100)} fill="none">
+              <animate attributeName="stroke-dashoffset" from="94.2" to="0" dur="2s" fill="freeze" />
+            </circle>
+          </svg>
         </div>
-        <div className="loader-bar" style={{ width: `${loadProgress}%` }} />
-        
-        {/* GLSL shader background */}
-        <ShaderBackground />
-        
-        {/* Custom cursor with interactions */}
-        <CustomCursor />
-        
-        {/* Add scroll animation manager */}
-        <ScrollManager />
-        
-        {/* Interactive particle background */}
-        <div className="fixed inset-0 pointer-events-none">
-          <ParticleCanvas />
-        </div>
-        
-        {/* Quantum navigation */}
-        <QuantumNavigation />
-        
-        {/* Main content container */}
-        <main id="main-content" className={`wormhole-container ${isLoading ? 'opacity-0' : ''}`}>
-          <motion.div 
-            className="wormhole-content"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            {/* Enhanced hero section with 3D effects */}
-            <EnhancedHero />
-            
-            {/* Quantum features section with interactive cards */}
-            <QuantumFeatures />
-            
-            {/* Prizes showcase section */}
-            <PrizesShowcase />
-            
-            {/* Enhanced schedule section with constellation timeline */}
-            <EnhancedSchedule />
-            
-            {/* Judging criteria section */}
-            <JudgingCriteria />
-            
-            {/* Team formation section */}
-            <TeamFormation />
-            
-            {/* Developer resources section */}
-            <DeveloperResources />
-            
-            {/* Enhanced image gallery */}
-            <ImagesGallery />
-            
-            {/* Social proof section with testimonials */}
-            <SocialProof />
-            
-            {/* Enhanced testimonials section */}
-            <EnhancedTestimonials />
-            
-            {/* Enhanced FAQ section */}
-            <EnhancedFAQ />
-            
-            {/* Enhanced registration with black hole effect */}
-            <EnhancedRegister />
-            
-            {/* Enhanced sponsors section with interactive cards */}
-            <EnhancedSponsors />
-            
-            {/* Enhanced contact section */}
-            <EnhancedContact />
-          </motion.div>
-        </main>
-        
-        {/* Enhanced footer with floating asteroids */}
-        <EnhancedFooter />
+        <div className="loading-text">QUANTUM PORTAL INITIALIZING</div>
+        <div className="loading-progress">{Math.round(loadProgress)}%</div>
       </div>
-    </ThemeProvider>
+      <div className="loader-bar" style={{ width: `${loadProgress}%` }} />
+      
+      {/* GLSL shader background */}
+      <ShaderBackground />
+      
+      {/* Custom cursor with interactions */}
+      <CustomCursor />
+      
+      {/* Add scroll animation manager */}
+      <ScrollManager />
+      
+      {/* Interactive particle background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <ParticleCanvas />
+      </div>
+      
+      {/* Quantum navigation */}
+      <QuantumNavigation />
+      
+      {/* Main content container */}
+      <main id="main-content" className={`wormhole-container ${isLoading ? 'opacity-0' : ''}`}>
+        <motion.div 
+          className="wormhole-content"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          {/* Enhanced hero section with 3D effects */}
+          <EnhancedHero />
+          
+          {/* Quantum features section with interactive cards */}
+          <QuantumFeatures />
+          
+          {/* Prizes showcase section */}
+          <PrizesShowcase />
+          
+          {/* Enhanced schedule section with constellation timeline */}
+          <EnhancedSchedule />
+          
+          {/* Judging criteria section */}
+          <JudgingCriteria />
+          
+          {/* Team formation section */}
+          <TeamFormation />
+          
+          {/* Developer resources section */}
+          <DeveloperResources />
+          
+          {/* Enhanced image gallery */}
+          <ImagesGallery />
+          
+          {/* Social proof section with testimonials */}
+          <SocialProof />
+          
+          {/* Enhanced testimonials section */}
+          <EnhancedTestimonials />
+          
+          {/* Enhanced FAQ section */}
+          <EnhancedFAQ />
+          
+          {/* Enhanced registration with black hole effect */}
+          <EnhancedRegister />
+          
+          {/* Enhanced sponsors section with interactive cards */}
+          <EnhancedSponsors />
+          
+          {/* Enhanced contact section */}
+          <EnhancedContact />
+        </motion.div>
+      </main>
+      
+      {/* Enhanced footer with floating asteroids */}
+      <EnhancedFooter />
+    </div>
   );
 };
 
