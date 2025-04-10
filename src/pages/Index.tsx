@@ -14,6 +14,8 @@ import ScrollManager from '@/components/ScrollManager';
 import EnhancedFAQ from '@/components/EnhancedFAQ';
 import EnhancedTestimonials from '@/components/EnhancedTestimonials';
 import EnhancedContact from '@/components/EnhancedContact';
+import ImagesGallery from '@/components/ImagesGallery';
+import ParticleCanvas from '@/components/ParticleCanvas';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -302,12 +304,12 @@ const Index = () => {
     const passiveSupported = () => {
       let passive = false;
       try {
-        const options = {
-          get passive() {
+        const options = Object.defineProperty({}, 'passive', {
+          get: function() {
             passive = true;
             return true;
           }
-        };
+        });
         // Use a standard event name instead of "test"
         window.addEventListener("touchstart", null as any, options);
         window.removeEventListener("touchstart", null as any, options);
@@ -368,6 +370,11 @@ const Index = () => {
         {/* Add scroll animation manager */}
         <ScrollManager />
         
+        {/* Interactive particle background */}
+        <div className="fixed inset-0 pointer-events-none">
+          <ParticleCanvas />
+        </div>
+        
         {/* Quantum navigation */}
         <QuantumNavigation />
         
@@ -379,6 +386,9 @@ const Index = () => {
             
             {/* Quantum features section with interactive cards */}
             <QuantumFeatures />
+            
+            {/* Enhanced image gallery */}
+            <ImagesGallery />
             
             {/* Enhanced testimonials section */}
             <EnhancedTestimonials />
