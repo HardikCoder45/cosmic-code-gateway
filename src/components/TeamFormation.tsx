@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/providers/ThemeProvider';
 import { motion } from 'framer-motion';
-import { Users, UserPlus, MessageSquare, Broadcast, Code, Palette } from 'lucide-react';
+import { Users, UserPlus, MessageSquare, Radio, Code, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 
@@ -267,7 +266,7 @@ const TeamFormation = () => {
               description: "This feature will be available when registration opens.",
             })}
           >
-            <Broadcast className="w-5 h-5 mr-2" />
+            <Radio className="w-5 h-5 mr-2" />
             Create Your Hacker Profile
           </Button>
         </motion.div>
