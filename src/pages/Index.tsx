@@ -15,7 +15,13 @@ import EnhancedFAQ from '@/components/EnhancedFAQ';
 import EnhancedTestimonials from '@/components/EnhancedTestimonials';
 import EnhancedContact from '@/components/EnhancedContact';
 import ImagesGallery from '@/components/ImagesGallery';
-import ParticleCanvas from '@/components/ParticleCanvas';
+import ParticleCanvas from '@/components/ParticleSystem/ParticleCanvas';
+import SocialProof from '@/components/SocialProof';
+import PrizesShowcase from '@/components/PrizesShowcase';
+import JudgingCriteria from '@/components/JudgingCriteria';
+import TeamFormation from '@/components/TeamFormation';
+import DeveloperResources from '@/components/DeveloperResources';
+import { motion } from 'framer-motion';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -380,21 +386,41 @@ const Index = () => {
         
         {/* Main content container */}
         <main id="main-content" className={`wormhole-container ${isLoading ? 'opacity-0' : ''}`}>
-          <div className="wormhole-content">
+          <motion.div 
+            className="wormhole-content"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             {/* Enhanced hero section with 3D effects */}
             <EnhancedHero />
             
             {/* Quantum features section with interactive cards */}
             <QuantumFeatures />
             
-            {/* Enhanced image gallery */}
-            <ImagesGallery />
-            
-            {/* Enhanced testimonials section */}
-            <EnhancedTestimonials />
+            {/* Prizes showcase section */}
+            <PrizesShowcase />
             
             {/* Enhanced schedule section with constellation timeline */}
             <EnhancedSchedule />
+            
+            {/* Judging criteria section */}
+            <JudgingCriteria />
+            
+            {/* Team formation section */}
+            <TeamFormation />
+            
+            {/* Developer resources section */}
+            <DeveloperResources />
+            
+            {/* Enhanced image gallery */}
+            <ImagesGallery />
+            
+            {/* Social proof section with testimonials */}
+            <SocialProof />
+            
+            {/* Enhanced testimonials section */}
+            <EnhancedTestimonials />
             
             {/* Enhanced FAQ section */}
             <EnhancedFAQ />
@@ -407,7 +433,7 @@ const Index = () => {
             
             {/* Enhanced contact section */}
             <EnhancedContact />
-          </div>
+          </motion.div>
         </main>
         
         {/* Enhanced footer with floating asteroids */}
